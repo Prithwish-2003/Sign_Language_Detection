@@ -1,35 +1,42 @@
-import sys,os
-from Sign_Language.pipeline.training_pipeline import TrainPipeline
-from Sign_Language.exception import CustomException
-from Sign_Language.utils.main_utils import decodeImages,encodeImageIntoBase64
-from flask import Flask,request,jsonify,render_template,Response
-from flask_cors import CORS,cross_origin
+import sys, os
+from signLanguage.pipeline.training_pipeline import TrainPipeline
+from signLanguage.exception import SignException
+from signLanguage.utils.main_utils import decodeImage, encodeImageIntoBase64
+from flask import Flask, request, jsonify, render_template,Response
+from flask_cors import CORS, cross_origin
 
-app= Flask(__name__)
+
+app = Flask(__name__)
 CORS(app)
+
+
 
 class ClientApp:
     def __init__(self):
-        self.filename ="inputImage.jpg"
+        self.filename = "inputImage.jpg"
+
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
+
 @app.route("/train")
 def trainRoute():
-    obj= TrainPipeline()
+    obj = TrainPipeline()
     obj.run_pipeline()
-    return "Training Successfull!!"
+    return "Training Successfull!!" 
 
 
-@app.route("/predict",methods=['POST','GET'])
+
+
+@app.route("/predict", methods=['POST','GET'])
 @cross_origin()
 def predictRoute():
     try:
         image = request.json['image']
-        decodeImages(image, clApp.filename)
+        decodeImage(image, clApp.filename)
 
         os.system("cd yolov5/ && python detect.py --weights my_model.pt --img 416 --conf 0.5 --source ../data/inputImage.jpg")
 
@@ -68,4 +75,4 @@ def predictLive():
 
 if __name__ == "__main__":
     clApp = ClientApp()
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8080)
